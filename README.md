@@ -120,3 +120,35 @@ npm start
 
 ### Step 3: Launch Frontend SPA
 Simply serve the `frontend/` directory using any local web hosting server (e.g. VS Code Live Server, python http server, or simply opening `frontend/index.html` directly in modern web browsers) to start assessing your engineering skills!
+
+---
+
+## 5. ☁️ Live Cloud Deployment (Render + Vercel)
+
+Wrenchy Quiz is fully configured for a secure and performant multi-cloud production architecture:
+- **Backend**: Hosted on **Render** (`https://wrenchy-quiz.onrender.com`).
+- **Frontend**: Hosted on **Vercel** (`https://<your-project>.vercel.app`).
+
+### A. Dynamic API Switching (`frontend/app.js`)
+The application automatically determines its host environment on launch:
+```javascript
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? '/api'
+  : 'https://wrenchy-quiz.onrender.com/api';
+```
+- During **local development**, it targets your local endpoint `/api`.
+- In **production on Vercel**, it connects directly to the live Render endpoint.
+
+### B. Vercel Configuration (`vercel.json`)
+A custom [vercel.json](file:///Users/user/Desktop/Interactive%20Quiz%20App/vercel.json) configuration file resides in the root directory. It handles paths automatically:
+- **API Request Proxies**: Proxies Vercel incoming `/api` calls straight to the Render backend to prevent cross-origin or local certificate mismatches.
+- **Root Routing**: Automatically maps domain queries straight into `/frontend` static directories without exposing private backend configuration files.
+
+### C. Deploying the Frontend to Vercel
+1. Log in to your **Vercel Dashboard** and click **New Project**.
+2. Select your GitHub repository: `Nithya-sri-14/Wrenchy-Quiz`.
+3. In **Project Configuration**:
+   - Keep the **Root Directory** as the repository root `./`.
+   - The included `vercel.json` file will automatically handle the build and source path mapping.
+4. Click **Deploy**. Your live frontend will be up and running in under 30 seconds!
+
