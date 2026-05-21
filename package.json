@@ -1,0 +1,27 @@
+{
+  "name": "interactive-quiz-app",
+  "version": "1.0.0",
+  "description": "A premium Interactive Quiz App featuring modern glassmorphic web UI, custom Web Audio synthesis, circular countdown timer, Node/Express backend, and persistent leaderboard.",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js"
+  },
+  "keywords": [
+    "quiz",
+    "interactive",
+    "express",
+    "glassmorphism",
+    "web-audio-api"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "multer": "^2.1.1",
+    "xlsx": "^0.18.5"
+  }
+}

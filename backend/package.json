@@ -1,0 +1,15 @@
+{
+  "name": "interactive-technical-quiz-backend",
+  "version": "1.0.0",
+  "description": "Integrated Express backend API server for the Interactive Technical Quiz Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "author": "Antigravity Dev Team",
+  "license": "MIT"
+}
