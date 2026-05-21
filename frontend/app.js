@@ -209,7 +209,9 @@ const synth = new RetroSynth();
 /* ==========================================================================
    2. QUIZ APPLICATION CORE STATE MANAGER
    ========================================================================== */
-const API_BASE = '/api';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? '/api'
+  : 'https://wrenchy-quiz.onrender.com/api';
 
 const state = {
   categories: [],
