@@ -869,6 +869,84 @@ function startGlobalTimer() {
   }, 1000);
 }
 
+function startBotSimulation() {
+  clearTimeout(state.versusOpponentInterval);
+  
+  const botNameEl = document.getElementById('vs-opponent-name');
+  const botName = botNameEl ? botNameEl.textContent.replace(' (Bot PvP)', '') : 'StackOverlord';
+  
+  state.botName = botName;
+  state.botCorrectAnswers = 0;
+  state.botCurrentIndex = 0;
+  state.botFinished = false;
+  
+  const totalQuestions = state.questions.length || 5;
+  const difficulty = state.selectedDifficulty || 'medium';
+  
+  // Decide accuracy and response interval bounds based on difficulty
+  let correctChance = 0.70;
+  let minSec = 5;
+  let maxSec = 9;
+  
+  if (difficulty === 'easy') {
+    correctChance = 0.50;
+    minSec = 6;
+    maxSec = 11;
+  } else if (difficulty === 'hard') {
+    correctChance = 0.90;
+    minSec = 4;
+    maxSec = 7;
+  }
+  
+  const opponentFill = document.getElementById('vs-opponent-fill');
+  const statusFeed = document.getElementById('versus-status-feed');
+  
+  function nextBotStep() {
+    if (state.botFinished || state.quizFinishing) return;
+    
+    // Choose random answer time
+    const waitTime = (Math.random() * (maxSec - minSec) + minSec) * 1000;
+    
+    state.versusOpponentInterval = setTimeout(() => {
+      if (state.botFinished || state.quizFinishing) return;
+      
+      const isCorrect = Math.random() < correctChance;
+      if (isCorrect) {
+        state.botCorrectAnswers++;
+      }
+      
+      state.botCurrentIndex++;
+      
+      if (opponentFill) {
+        const pct = (state.botCurrentIndex / totalQuestions) * 100;
+        opponentFill.style.width = `${pct}%`;
+      }
+      
+      if (statusFeed) {
+        if (isCorrect) {
+          statusFeed.innerHTML = `<span style="color: var(--warning); font-weight: 600;">${botName}</span> answered Question ${state.botCurrentIndex} <span style="color: var(--success);">correctly</span>!`;
+        } else {
+          statusFeed.innerHTML = `<span style="color: var(--warning); font-weight: 600;">${botName}</span> answered Question ${state.botCurrentIndex} <span style="color: var(--danger);">incorrectly</span>.`;
+        }
+      }
+      
+      synth.playTick(); // subtle beep for opponent updates
+      
+      if (state.botCurrentIndex >= totalQuestions) {
+        state.botFinished = true;
+        if (statusFeed) {
+          statusFeed.innerHTML = `<span style="color: var(--warning); font-weight: 600;">${botName}</span> has completed the quiz! <span style="color: var(--text-muted);">Waiting for you...</span>`;
+        }
+      } else {
+        nextBotStep();
+      }
+    }, waitTime);
+  }
+  
+  // Start the first step
+  nextBotStep();
+}
+
 async function fetchLeaderboard() {
   DOM.leaderboardTableBody.innerHTML = `
     <tr>
@@ -1302,6 +1380,7 @@ async function finishQuizSession() {
 
     clearInterval(state.globalTimerInterval);
     clearInterval(state.timerInterval);
+    clearTimeout(state.versusOpponentInterval);
     if (DOM.timerContainer) {
       DOM.timerContainer.classList.remove('time-attack', 'warning-critical');
     }
@@ -1321,10 +1400,33 @@ async function finishQuizSession() {
       }
     }
 
-    state.leaderboardScoreBanner = {
-      percent: scorePercent,
-      detail: `${correctCount} / ${qCount} correct`,
-    };
+    if (state.quizMode === 'versus') {
+      const botCorrect = state.botCorrectAnswers || 0;
+      const botName = state.botName || 'StackOverlord';
+      let outcome = '';
+      let outcomeClass = '';
+      if (correctCount > botCorrect) {
+        outcome = '🏆 BATTLE VICTORY!';
+        outcomeClass = 'versus-win';
+      } else if (correctCount < botCorrect) {
+        outcome = '💀 BATTLE DEFEAT';
+        outcomeClass = 'versus-loss';
+      } else {
+        outcome = '🤝 BATTLE DRAW';
+        outcomeClass = 'versus-draw';
+      }
+      state.leaderboardScoreBanner = {
+        percent: scorePercent,
+        detail: `${correctCount} / ${qCount} correct vs ${botCorrect} / ${qCount} by ${botName}`,
+        versusOutcome: outcome,
+        versusClass: outcomeClass
+      };
+    } else {
+      state.leaderboardScoreBanner = {
+        percent: scorePercent,
+        detail: `${correctCount} / ${qCount} correct`,
+      };
+    }
 
     saveLocalStatistics(scorePercent, state.score, state.selectedCategory);
 
@@ -3458,9 +3560,22 @@ function showLeaderboardQuizScoreBanner() {
     wrap.classList.add('hide');
     return;
   }
+  const labelEl = wrap.querySelector('.leaderboard-your-score-label');
   const val = document.getElementById('leaderboard-your-score-value');
   const det = document.getElementById('leaderboard-your-score-detail');
-  if (val) val.textContent = `${banner.percent}%`;
+  
+  // Reset classes
+  wrap.classList.remove('versus-win', 'versus-loss', 'versus-draw');
+  
+  if (banner.versusOutcome) {
+    if (labelEl) labelEl.textContent = banner.versusOutcome;
+    wrap.classList.add(banner.versusClass);
+    if (val) val.textContent = `${banner.percent}%`;
+  } else {
+    if (labelEl) labelEl.textContent = 'Your quiz score';
+    if (val) val.textContent = `${banner.percent}%`;
+  }
+  
   if (det) det.textContent = banner.detail || '';
   wrap.classList.remove('hide');
 }

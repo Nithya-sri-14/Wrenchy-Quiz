@@ -3632,6 +3632,37 @@ dialog[open]::backdrop {
   margin: 8px 0 0;
 }
 
+/* Versus Battle Banners */
+.leaderboard-your-score.versus-win {
+  border: 1px solid rgba(46, 213, 115, 0.4);
+  background: linear-gradient(135deg, rgba(46, 213, 115, 0.12), rgba(255, 255, 255, 0.05)) !important;
+  box-shadow: 0 8px 32px rgba(46, 213, 115, 0.15) !important;
+}
+.leaderboard-your-score.versus-win .leaderboard-your-score-value {
+  color: var(--success) !important;
+  text-shadow: 0 0 10px rgba(46, 213, 115, 0.3) !important;
+}
+
+.leaderboard-your-score.versus-loss {
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  background: linear-gradient(135deg, rgba(255, 71, 87, 0.12), rgba(255, 255, 255, 0.05)) !important;
+  box-shadow: 0 8px 32px rgba(255, 71, 87, 0.15) !important;
+}
+.leaderboard-your-score.versus-loss .leaderboard-your-score-value {
+  color: var(--danger) !important;
+  text-shadow: 0 0 10px rgba(255, 71, 87, 0.3) !important;
+}
+
+.leaderboard-your-score.versus-draw {
+  border: 1px solid rgba(255, 165, 2, 0.4);
+  background: linear-gradient(135deg, rgba(255, 165, 2, 0.12), rgba(255, 255, 255, 0.05)) !important;
+  box-shadow: 0 8px 32px rgba(255, 165, 2, 0.15) !important;
+}
+.leaderboard-your-score.versus-draw .leaderboard-your-score-value {
+  color: var(--warning) !important;
+  text-shadow: 0 0 10px rgba(255, 165, 2, 0.3) !important;
+}
+
 .podium-container {
   display: flex;
   align-items: flex-end;
